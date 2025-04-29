@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VHS Horror</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      font-family: 'Share Tech Mono', monospace;
+      color: #00FF99;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('static.gif') repeat;
+      opacity: 0.1;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    #scanlines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      z-index: 9;
+      pointer-events: none;
+    }
+
+    .glitch {
+      font-size: 3rem;
+      text-align: center;
+      white-space: pre-wrap;
+      position: relative;
+      z-index: 5;
+      animation: flicker 3s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+      }
+      20%, 22%, 24%, 55% {
+        opacity: 0;
+      }
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      color: #f0f;
+      clip: rect(0, 900px, 0, 0);
+      animation: glitch 2s infinite linear alternate-reverse;
+    }
+
+    .glitch::after {
+      color: #0ff;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes glitch {
+      0% {
+        clip: rect(10px, 9999px, 50px, 0);
+        transform: skew(0.5deg);
+      }
+      10% {
+        clip: rect(85px, 9999px, 140px, 0);
+        transform: skew(-0.5deg);
+      }
+      20% {
+        clip: rect(25px, 9999px, 90px, 0);
+        transform: skew(1deg);
+      }
+      30% {
+        clip: rect(60px, 9999px, 130px, 0);
+        transform: skew(-1deg);
+      }
+      40% {
+        clip: rect(45px, 9999px, 100px, 0);
+        transform: skew(0.3deg);
+      }
+      50% {
+        clip: rect(10px, 9999px, 80px, 0);
+        transform: skew(-0.3deg);
+      }
+      60% {
+        clip: rect(5px, 9999px, 70px, 0);
+        transform: skew(0.2deg);
+      }
+      70% {
+        clip: rect(90px, 9999px, 140px, 0);
+        transform: skew(-0.2deg);
+      }
+      80% {
+        clip: rect(30px, 9999px, 100px, 0);
+        transform: skew(0.6deg);
+      }
+      90% {
+        clip: rect(50px, 9999px, 90px, 0);
+        transform: skew(-0.6deg);
+      }
+      100% {
+        clip: rect(10px, 9999px, 50px, 0);
+        transform: skew(0deg);
+      }
+    }
+
+    audio {
+      display: none;
+    }
+
+    .timestamp {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 1rem;
+      color: #00FF99;
+      opacity: 0.8;
+      z-index: 11;
+    }
+
+    #vhs-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 20px solid rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+      animation: flickerFrame 2s infinite;
+      z-index: 8;
+      pointer-events: none;
+    }
+
+    @keyframes flickerFrame {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 0.7; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="timestamp">PLAY ▶ 00:01:32</div>
+  <div id="vhs-frame"></div>
+  
+  <div class="glitch" data-text="🔻 PLAYING VHS TAPE 🔻">🔻 PLAYING VHS TAPE 🔻</div>
+  <div class="glitch" data-text="DO NOT ADJUST YOUR TV">DO NOT ADJUST YOUR TV</div>
+
+  <!-- VHS static overlay -->
+  <div id="scanlines"></div>
+  <div id="overlay"></div>
+
+  <!-- Audio that plays after user click -->
+  <audio id="vhs-audio" src="audio/creepy-sound.mp3" preload="auto"></audio>
+  
+  <!-- Hidden Jumpscare Image -->
+  <img id="jumpscare-img" src="images/vhsimage.png" style="display:none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1000; opacity: 0;">
+
+  <!-- Jumpscare Sound -->
+  <audio id="jumpscare-sound" src="audio/vhs.mp3" preload="auto"></audio>
+
+  <script>
+    document.body.addEventListener('click', () => {
+      const audio = document.getElementById('vhs-audio');
+      audio.volume = 1.0;
+      audio.play();
+    });
+
+    function triggerJumpscare() {
+      const jumpscareImage = document.getElementById('jumpscare-img');
+      const jumpscareSound = document.getElementById('jumpscare-sound');
+
+      // Random delay between 5 to 20 seconds
+      const delay = Math.floor(Math.random() * 15000) + 5000;
+
+      console.log(`Jumpscare will trigger in: ${delay / 1000} seconds`);
+
+      // Wait for the random time, then show the jumpscare
+      setTimeout(() => {
+        console.log("Triggering jumpscare!");
+
+        // Show the jumpscare image
+        jumpscareImage.style.display = 'block';
+        jumpscareImage.style.opacity = '1'; // Make it visible
+        jumpscareSound.play(); // Play the jumpscare sound
+
+        // Hide the jumpscare after 3 seconds
+        setTimeout(() => {
+          jumpscareImage.style.display = 'none'; // Hide the jumpscare image
+          jumpscareImage.style.opacity = '0'; // Make it invisible again
+          console.log("Jumpscare hidden!");
+        }, 3000); // 3 seconds duration
+      }, delay);
+    }
+
+    // Call this function to trigger the jumpscare on page load
+    window.onload = triggerJumpscare;
+  </script>
+</body>
+</html>
